@@ -65,8 +65,8 @@ with sku_stock as (
         f.LeadTime,
         f.Revenue,
         case
-            when f.StockLevel < f.OrderQty then 'High'
-            when f.StockLevel < 2 * f.OrderQty then 'Medium'
+            when f.StockLevel < 0.5 * f.OrderQty then 'High'
+            when f.StockLevel < f.OrderQty then 'Medium'
             else 'Low'
         end as stockout_risk
     from factsupplychain f
@@ -110,7 +110,7 @@ order by cost_rank;
 select 
 s.InspectionResult,
 count(*) as count,
-round(count(*) * 100 / (select count(*) from dimsupplier),1 ) as Percentage
+round(count(*) * 100.0 / (select count(*) from dimsupplier),1 ) as Percentage
 from dimsupplier s
 group by s.InspectionResult
 order by count desc;
