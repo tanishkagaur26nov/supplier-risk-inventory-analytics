@@ -2,7 +2,7 @@
 
 An end-to-end analytics project on a supply chain dataset of **100 SKUs** across three product types: skincare, haircare and cosmetics. The goal is to find **which suppliers carry the most quality risk, which products are at risk of running out, and which delivery routes perform best**, and to turn those findings into practical recommendations.
 
-![Overview](screenshots/01_overview.png)
+![Overview](screenshot/01_overview.png)
 
 ---
 
@@ -101,7 +101,7 @@ All DAX measures are documented in [`powerbi/dax_measures.md`](powerbi/dax_measu
 
 | | |
 | --- | --- |
-| ![Supplier Risk](screenshots/02_supplier_risk.png) | ![Inventory & Logistics](screenshots/03_inventory_logistics.png) |
+| ![Supplier Risk](screenshot/02_supplier_risk.png) | ![Inventory & Logistics](screenshot/03_inventory_logistics.png) |
 
 ---
 
@@ -170,4 +170,4 @@ All DAX measures are documented in [`powerbi/dax_measures.md`](powerbi/dax_measu
 
 ## Author
 
-**Tanishka Gaur** · Risk & Compliance professional | PL-300 certified (Microsoft Power BI Data Analyst) · [LinkedIn]([[Add your LinkedIn URL]](https://www.linkedin.com/in/tanishkagaur26/)) · [Email](mailto:gaurtanishka52@gmail.com)
+**Tanishka Gaur** · Risk & Compliance professional | PL-300 certified (Microsoft Power BI Data Analyst) · [LinkedIn]([(https://www.linkedin.com/in/tanishkagaur26/)]) · [Email](mailto:gaurtanishka52@gmail.com)
