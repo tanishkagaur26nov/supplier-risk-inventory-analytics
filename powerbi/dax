@@ -1,0 +1,92 @@
+# DAX Measures
+
+All measures and calculated columns used in the Power BI report.
+
+## Core measures
+Total Revenue = SUM ( FactSupplyChain[Revenue] )
+
+Total Units Sold = SUM ( FactSupplyChain[UnitsSold] )
+
+SKU Count = DISTINCTCOUNT ( DimProduct[SKU] )
+
+## Revenue concentration (Pareto)
+
+Revenue Share % =
+DIVIDE (
+    [Total Revenue],
+    CALCULATE ( [Total Revenue], ALL ( DimProduct[ProductType] ) )
+)
+
+Cumulative Revenue % =
+VAR CurrentRevenue = [Total Revenue]
+VAR CumulativeRevenue =
+    CALCULATE (
+        [Total Revenue],
+        FILTER (
+            ALLSELECTED ( DimProduct[SKU] ),
+            [Total Revenue] >= CurrentRevenue
+        )
+    )
+VAR AllRevenue =
+    CALCULATE ( [Total Revenue], ALLSELECTED ( DimProduct[SKU] ) )
+RETURN
+    DIVIDE ( CumulativeRevenue, AllRevenue )
+
+80% Line = 0.8
+
+## Supplier risk
+Defect Rate (avg) = AVERAGE ( DimSupplier[DefectRate] )
+
+Lead Time (avg) = AVERAGE ( DimSupplier[SupplierLeadTime] )
+
+Inspection Count = COUNTROWS ( DimSupplier )
+
+Fail Rate (avg) =
+DIVIDE (
+    CALCULATE ( COUNTROWS ( DimSupplier ), DimSupplier[InspectionResult] = "Fail" ),
+    COUNTROWS ( DimSupplier )
+)
+
+Risk Score (dynamic) =
+VAR Suppliers = ALLSELECTED ( DimSupplier[SupplierName] )
+VAR n = COUNTROWS ( Suppliers )
+VAR rDefect = RANKX ( Suppliers, [Defect Rate (avg)], , ASC ) - 1
+VAR rLead   = RANKX ( Suppliers, [Lead Time (avg)], , ASC ) - 1
+VAR rFail   = RANKX ( Suppliers, [Fail Rate (avg)], , ASC ) - 1
+RETURN
+    100 * DIVIDE ( 0.4 * rDefect + 0.3 * rLead + 0.3 * rFail, n - 1 )
+
+Top Risk Supplier =
+MAXX (
+    TOPN ( 1, VALUES ( DimSupplier[SupplierName] ), [Risk Score (dynamic)], DESC ),
+    DimSupplier[SupplierName]
+)
+
+## Stock-out risk
+
+A calculated column on `FactSupplyChain`:
+- **High:** stock covers less than half of one order
+- **Medium:** stock covers less than one full order
+- **Low:** stock covers at least one full order
+
+Stockout Risk =
+SWITCH (
+    TRUE (),
+    FactSupplyChain[StockLevel] < 0.5 * FactSupplyChain[OrderQty], "High",
+    FactSupplyChain[StockLevel] < FactSupplyChain[OrderQty], "Medium",
+    "Low"
+)
+
+High Risk SKUs =
+CALCULATE ( [SKU Count], FactSupplyChain[Stockout Risk] = "High" )
+
+Revenue at Risk =
+CALCULATE ( [Total Revenue], FactSupplyChain[Stockout Risk] = "High" )
+
+Revenue at Risk % = DIVIDE ( [Revenue at Risk], [Total Revenue] )
+
+## Logistics
+
+Avg Shipping Cost = AVERAGE ( DimShipping[ShippingCost] )
+
+Avg Shipping Time (days) = AVERAGE ( DimShipping[ShippingTime] )
